@@ -1,0 +1,154 @@
+3362. Zero Array Transformation III
+
+You are given an integer array nums of length n and a 2D array queries where queries[i] = [li, ri].
+Each queries[i] represents the following action on nums:
+Decrement the value at each index in the range [li, ri] in nums by at most 1.
+The amount by which the value is decremented can be chosen independently for each index.
+A Zero Array is an array with all its elements equal to 0.
+Return the maximum number of elements that can be removed from queries, such that nums can still be converted 
+to a zero array using the remaining queries. If it is not possible to convert nums to a zero array, return -1.
+
+Example 1:
+Input: nums = [2,0,2], queries = [[0,2],[0,2],[1,1]]
+Output: 1
+Explanation:
+After removing queries[2], nums can still be converted to a zero array.
+Using queries[0], decrement nums[0] and nums[2] by 1 and nums[1] by 0.
+Using queries[1], decrement nums[0] and nums[2] by 1 and nums[1] by 0.
+
+Example 2:
+Input: nums = [1,1,1,1], queries = [[1,3],[0,2],[1,3],[1,2]]
+Output: 2
+Explanation:
+We can remove queries[2] and queries[3].
+
+Example 3:
+Input: nums = [1,2,3,4], queries = [[0,3]]
+Output: -1
+Explanation:
+nums cannot be converted to a zero array even after using all the queries.
+
+=====Good=====
+
+class Solution {
+    public int maxRemoval(int[] nums, int[][] queries) {
+        int n = nums.length;
+
+        // Min-heap for used queries (stores end indices)
+        PriorityQueue<Integer> past = new PriorityQueue<>();
+
+        // Max-heap for available queries (stores end indices)
+        PriorityQueue<Integer> maxHeap = new PriorityQueue<>(Collections.reverseOrder());
+
+        // Sort queries by start index
+        Arrays.sort(queries, (a, b) -> Integer.compare(a[0], b[0]));
+
+        int j = 0;               // Pointer to queries
+        int usedCount = 0;       // Number of queries used
+
+        for (int i = 0; i < n; i++) {
+            // Push all queries starting at index i
+            while (j < queries.length && queries[j][0] == i) {
+                maxHeap.offer(queries[j][1]);  // Push only end index
+                j++;
+            }
+
+            // Apply effect of already used queries
+            nums[i] -= past.size();
+
+            // Apply more queries if needed
+            while (nums[i] > 0 && !maxHeap.isEmpty() && maxHeap.peek() >= i) {
+                int r = maxHeap.poll();
+                past.offer(r);
+                usedCount++;
+                nums[i]--;
+            }
+
+            // If we can't make nums[i] zero
+            if (nums[i] > 0) return -1;
+
+            // Remove expired queries
+            while (!past.isEmpty() && past.peek() == i) {
+                past.poll();
+            }
+        }
+        return queries.length - usedCount;
+    }
+}
+
+=====Better=====
+
+class Solution {
+
+    public int maxRemoval(int[] nums, int[][] queries) {
+        Arrays.sort(queries, (a, b) -> a[0] - b[0]);
+        PriorityQueue<Integer> heap = new PriorityQueue<>(
+            Collections.reverseOrder()
+        );
+        int[] deltaArray = new int[nums.length + 1];
+        int operations = 0;
+
+        for (int i = 0, j = 0; i < nums.length; i++) {
+            operations += deltaArray[i];
+            while (j < queries.length && queries[j][0] == i) {
+                heap.offer(queries[j][1]);
+                j++;
+            }
+            while (
+                operations < nums[i] && !heap.isEmpty() && heap.peek() >= i
+            ) {
+                operations += 1;
+                deltaArray[heap.poll() + 1] -= 1;
+            }
+            if (operations < nums[i]) {
+                return -1;
+            }
+        }
+        return heap.size();
+    }
+}
+
+=====Optimal=====
+
+class Solution {
+    public int maxRemoval(int[] nums, int[][] queries) {
+        int n = nums.length;
+        int[] endCount = new int[n];
+
+        // Count number of queries starting at each index
+        for (int[] query : queries)
+            endCount[query[0]]++;
+
+        // Create groupedEnds[i] array to store all query ends starting at index i
+        int[][] groupedEnds = new int[n][];
+        for (int i = 0; i < n; i++)
+            groupedEnds[i] = new int[endCount[i]];
+
+        // Fill groupedEnds arrays
+        for (int[] query : queries)
+            groupedEnds[query[0]][--endCount[query[0]]] = query[1];
+
+        int removedCount = 0;
+        Queue<Integer> activeEnds = new PriorityQueue<>();
+
+        for (int i = 0; i < n; i++) {
+            for (int end : groupedEnds[i])
+                activeEnds.offer(-end); // max-heap via negation
+
+            int required = nums[i] - removedCount;
+            if (required > 0) {
+                if (required > activeEnds.size()) return -1;
+                removedCount += required;
+                while (required-- > 0) {
+                    int end = -activeEnds.poll();
+                    if (end < i) return -1;
+                    endCount[end]++;
+                }
+            }
+
+            removedCount -= endCount[i];
+        }
+
+        return activeEnds.size();
+    }
+}

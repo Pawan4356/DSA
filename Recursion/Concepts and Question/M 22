@@ -1,0 +1,16 @@
+class Solution {
+    public List<String> generateParenthesis(int n) {
+        List<String> result = new ArrayList<>();
+        solve(result, n, 0, 0, "");
+        return result;
+    }
+
+    private void solve(List<String> result, int n, int left, int right, String curr) {
+        if (curr.length() == 2 * n) {
+            result.add(curr);
+            return;
+        }
+        if (right < n) solve(result, n, left, right + 1, curr + "(");
+        if (right > left) if (left < n) solve(result, n, left + 1, right, curr + ")");
+    }
+}   

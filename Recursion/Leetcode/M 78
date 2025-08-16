@@ -1,0 +1,21 @@
+class Solution {
+    List<Integer> temp;
+
+    public List<List<Integer>> subsets(int[] nums) {
+        List<List<Integer>> result = new ArrayList<>();
+        temp = new ArrayList<>();
+        solve(result, nums, 0);
+        return result;
+    }
+
+    private void solve(List<List<Integer>> result, int[] nums, int idx) {
+        if (idx == nums.length) {
+            result.add(new ArrayList<>(temp));
+            return;
+        }
+        temp.add(nums[idx]);
+        solve(result, nums, idx + 1);
+        temp.remove(temp.size() - 1);
+        solve(result, nums, idx + 1);
+    }
+}

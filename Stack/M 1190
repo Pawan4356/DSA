@@ -1,0 +1,78 @@
+1190. Reverse Substrings Between Each Pair of Parentheses
+
+You are given a string s that consists of lower case English letters and brackets.
+Reverse the strings in each pair of matching parentheses, starting from the innermost one.
+Your result should not contain any brackets.
+
+Example 1:
+
+Input: s = "(abcd)"
+Output: "dcba"
+
+Example 2:
+
+Input: s = "(u(love)i)"
+Output: "iloveu"
+Explanation: The substring "love" is reversed first, then the whole string is reversed.
+
+Example 3:
+
+Input: s = "(ed(et(oc))el)"
+Output: "leetcode"
+Explanation: First, we reverse the substring "oc", then "etco", and finally, the whole string.
+
+class Solution {
+    public String reverseParentheses(String s) {
+        Stack<Integer> st = new Stack<>();
+        StringBuilder res = new StringBuilder();
+        for(char a : s.toCharArray()) {
+            if(a == '(') {
+                st.push(res.length());
+            } else if(a == ')') {
+                int start = st.pop();
+                int end = res.length() - 1;
+                reverse(res, start, end);
+            } else {
+                res.append(a);
+            }
+        }
+        return res.toString();
+    }
+    private void reverse(StringBuilder s, int start, int end) {
+        while (start < end) {
+            char temp = s.charAt(start);
+            s.setCharAt(start, s.charAt(end));
+            s.setCharAt(end, temp);
+            start++;
+            end--;
+        }
+    }
+}
+
+=====Better=====
+
+class Solution {
+    int i = 0;
+    public String reverseParentheses(String s) {
+        char[] ar = s.toCharArray();
+        return helper(ar);
+    }
+    public String helper(char[] s){
+        StringBuilder sb = new StringBuilder();
+        while(i < s.length){
+            if(s[i] == ')'){
+                i++;
+                return sb.reverse().toString();
+            }else if(s[i] == '('){
+                i++;
+                String st  = helper(s);
+                //System.out.println(st);
+                sb.append(st);
+            }else{
+                sb.append(s[i]);
+                i++;
+            }
+        }
+        return sb.toString();
+    }
+}

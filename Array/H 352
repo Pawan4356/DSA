@@ -1,0 +1,117 @@
+352. Data Stream as Disjoint Intervals
+
+Given a data stream input of non-negative integers a1, a2, ..., an, summarize the 
+numbers seen so far as a list of disjoint intervals.
+Implement the SummaryRanges class:
+SummaryRanges() Initializes the object with an empty stream.
+void addNum(int value) Adds the integer value to the stream.
+int[][] getIntervals() Returns a summary of the integers in the stream currently as a 
+list of disjoint intervals [starti, endi]. The answer should be sorted by starti.
+ 
+
+Example 1:
+
+Input
+["SummaryRanges", "addNum", "getIntervals", "addNum", "getIntervals", "addNum", "getIntervals", "addNum", "getIntervals", "addNum", "getIntervals"]
+[[], [1], [], [3], [], [7], [], [2], [], [6], []]
+Output
+[null, null, [[1, 1]], null, [[1, 1], [3, 3]], null, [[1, 1], [3, 3], [7, 7]], null, [[1, 3], [7, 7]], null, [[1, 3], [6, 7]]]
+
+Explanation
+SummaryRanges summaryRanges = new SummaryRanges();
+summaryRanges.addNum(1);      // arr = [1]
+summaryRanges.getIntervals(); // return [[1, 1]]
+summaryRanges.addNum(3);      // arr = [1, 3]
+summaryRanges.getIntervals(); // return [[1, 1], [3, 3]]
+summaryRanges.addNum(7);      // arr = [1, 3, 7]
+summaryRanges.getIntervals(); // return [[1, 1], [3, 3], [7, 7]]
+summaryRanges.addNum(2);      // arr = [1, 2, 3, 7]
+summaryRanges.getIntervals(); // return [[1, 3], [7, 7]]
+summaryRanges.addNum(6);      // arr = [1, 2, 3, 6, 7]
+summaryRanges.getIntervals(); // return [[1, 3], [6, 7]]
+
+=====Good One=====
+
+class SummaryRanges {
+    HashSet<Integer> set;
+    public SummaryRanges() {
+        set = new HashSet<>();
+    }
+    
+    public void addNum(int value) {
+        set.add(value);
+    }
+    
+    public int[][] getIntervals() {
+        int n = set.size();
+        if (n == 0) {
+            return new int[0][0];
+        }
+        int[] nums = new int[n];
+        int index = 0;
+        for (Integer num : set) {
+            nums[index++] = num;
+        }
+        Arrays.sort(nums);
+        List<int[]> list = new ArrayList<>();
+        int start = nums[0];
+        int end = nums[0];
+        for (int i = 1; i < n; i++) {
+            if (nums[i] == end + 1) {
+                end = nums[i];
+            } else {
+                list.add(new int[]{start, end});
+                start = nums[i];
+                end = nums[i];
+            }
+        }
+        list.add(new int[]{start, end});
+        return list.toArray(new int[list.size()][]); 
+    }
+}
+
+=====Another One=====
+
+class SummaryRanges {
+    TreeMap<Integer, Integer> tree;
+
+    public SummaryRanges() {
+        tree = new TreeMap<>();
+    }
+
+    public void addNum(int value) {
+        if (tree.containsKey(value)) {
+            return;
+        }
+
+        Integer low = tree.floorKey(value);
+        Integer high = tree.ceilingKey(value);
+        boolean l = (low != null && tree.get(low) + 1 >= value);
+        boolean h = (high != null && high - 1 <= value);
+
+        if (l && h) {
+            int ns = low;
+            int ne = tree.get(high);
+            tree.put(ns, ne);
+            tree.remove(high);
+        } else if (l) {
+            tree.put(low, Math.max(tree.get(low), value));
+        } else if (h) {
+            tree.put(value, tree.get(high));
+            tree.remove(high);
+        } else {
+            tree.put(value, value);
+        }
+    }
+
+    public int[][] getIntervals() {
+        int[][] res = new int[tree.size()][2];
+        int in = 0;
+        for (Map.Entry<Integer, Integer> entry : tree.entrySet()) {
+            res[in][0] = entry.getKey();
+            res[in][1] = entry.getValue();
+            in++;
+        }
+        return res;
+    }
+}

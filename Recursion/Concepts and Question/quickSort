@@ -1,0 +1,27 @@
+class Solution {
+    static void quickSort(int arr[], int low, int high) {
+        if (low > high) return;
+        int index = partition(arr, low, high);
+        quickSort(arr, low, index - 1);
+        quickSort(arr, index + 1, high);
+    }
+
+    static int partition(int arr[], int low, int high) {
+        int pos = low;
+        int pivot = arr[high];
+        for (int i = low; i < high; i++) {
+            if (arr[i] < pivot) {
+                swap(arr, pos, i);
+                pos++;
+            }
+        }
+        swap(arr, pos, high);
+        return pos;
+    }
+    
+    private static void swap(int arr[], int pos, int high) {
+        int temp = arr[pos];
+        arr[pos] = arr[high];
+        arr[high] = temp;
+    }
+}

@@ -1,0 +1,18 @@
+124. Binary Tree Maximum Path Sum
+
+class Solution {
+    private int sum = Integer.MIN_VALUE;
+    public int maxPathSum(TreeNode root) {
+        sum = root.val;
+        int temp = max(root);
+        return Math.max(sum, temp);
+    }
+
+    private int max(TreeNode root) {
+        if (root == null) return 0;
+        int left = Math.max(0, max(root.left));
+        int right = Math.max(0, max(root.right));
+        sum = Math.max(sum, Math.max(root.val, Math.max(root.val + left, Math.max(root.val + right, root.val + right + left))));
+        return root.val + Math.max(left, right);
+    }
+}

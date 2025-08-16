@@ -1,0 +1,147 @@
+3372. Maximize the Number of Target Nodes After Connecting Trees I
+
+There exist two undirected trees with n and m nodes, with distinct labels in ranges [0, n - 1] and 
+[0, m - 1], respectively.You are given two 2D integer arrays edges1 and edges2 of lengths n - 1 and m - 1, 
+respectively, where edges1[i] = [ai, bi] indicates that there is an edge between nodes ai and bi in the 
+first tree and edges2[i] = [ui, vi] indicates that there is an edge between nodes ui and vi in the second 
+tree. You are also given an integer k. Node u is target to node v if the number of edges on the path from 
+u to v is less than or equal to k. Note that a node is always target to itself.
+Return an array of n integers answer, where answer[i] is the maximum possible number of nodes target to node 
+i of the first tree if you have to connect one node from the first tree to another node in the second tree.
+Note that queries are independent from each other. That is, for every query you will remove the added 
+edge before proceeding to the next query.
+
+Example 1:
+Input: edges1 = [[0,1],[0,2],[2,3],[2,4]], edges2 = [[0,1],[0,2],[0,3],[2,7],[1,4],[4,5],[4,6]], k = 2
+Output: [9,7,9,8,8]
+Explanation:
+For i = 0, connect node 0 from the first tree to node 0 from the second tree.
+For i = 1, connect node 1 from the first tree to node 0 from the second tree.
+For i = 2, connect node 2 from the first tree to node 4 from the second tree.
+For i = 3, connect node 3 from the first tree to node 4 from the second tree.
+For i = 4, connect node 4 from the first tree to node 4 from the second tree.
+
+Example 2:
+Input: edges1 = [[0,1],[0,2],[0,3],[0,4]], edges2 = [[0,1],[1,2],[2,3]], k = 1
+Output: [6,3,3,3,3]
+Explanation:
+For every i, connect node i of the first tree with any node of the second tree.
+
+===== Using BFS =====
+
+class Solution {
+    public int[] maxTargetNodes(int[][] edges1, int[][] edges2, int k) {
+        int n = edges1.length + 1;
+        int m = edges2.length + 1;
+        int[] result1 = new int[n];
+        result1 = findCount(edges1, k, n);
+        int[] result2 = new int[n];
+        result2 = findCount(edges2, k - 1, m);
+        int maxAdd = 0;
+        for (int i : result2) {
+            if (maxAdd < i)
+                maxAdd = i;
+        }
+        if (maxAdd > 0) {
+            for (int i = 0; i < n; i++) {
+                result1[i] += maxAdd;
+            }
+        }
+        return result1;
+    }
+
+    private int[] findCount(int edges[][], int k, int n) {
+        // Create adjacency List.
+        HashMap<Integer, List<Integer>> adj = new HashMap<>();
+        for (int[] e : edges) {
+            int u = e[0];
+            int v = e[1];
+            adj.putIfAbsent(u, new ArrayList<>());
+            adj.putIfAbsent(v, new ArrayList<>());
+            adj.get(u).add(v);
+            adj.get(v).add(u);
+        }
+        // Apply BFS or DFS
+        int[] result = new int[n];
+        for (int i = 0; i < n; i++) {
+            result[i] = bfs(i, adj, k, n);
+        }
+        return result;
+    }
+
+    private int bfs(int currNode, HashMap<Integer, List<Integer>> adj, int k, int n) {
+        Queue<int[]> queue = new LinkedList<>();
+        queue.add(new int[] { currNode, 0 });
+        boolean[] visited = new boolean[n];
+        Arrays.fill(visited, false);
+        visited[currNode] = true;
+        int count = 0; // Count the target nodes.
+        while (!queue.isEmpty()) {
+            int[] curr = queue.poll();
+            int node = curr[0];
+            int dist = curr[0];
+            if (dist > k) continue;
+            else if (dist <= k) count++;
+            // Visit neighbours of current node.
+            for (int neighbour : adj.get(node)) {
+                if (!visited[neighbour]) {
+                    visited[neighbour] = true;
+                    queue.add(new int[] { neighbour, dist + 1 });
+                }
+            }
+        }
+        return count;
+    }
+}
+
+===== Using DFS =====
+
+class Solution {
+    // public int[] maxTargetNodes(int[][] edges1, int[][] edges2, int k) {
+    //     int n = edges1.length + 1;
+    //     int m = edges2.length + 1;
+    //     int[] result1 = new int[n];
+    //     result1 = findCount(edges1, k, n);
+    //     int[] result2 = new int[n];
+    //     result2 = findCount(edges2, k - 1, m);
+    //     int maxAdd = 0;
+    //     for (int i : result2) {
+    //         if (maxAdd < i)
+    //             maxAdd = i;
+    //     }
+    //     if (maxAdd > 0) {
+    //         for (int i = 0; i < n; i++) {
+    //             result1[i] += maxAdd;
+    //         }
+    //     }
+    //     return result1;
+    // }
+
+    // private int[] findCount(int edges[][], int k, int n) {
+    //     // Create adjacency List.
+    //     HashMap<Integer, List<Integer>> adj = new HashMap<>();
+    //     for (int[] e : edges) {
+    //         int u = e[0];
+    //         int v = e[1];
+    //         adj.putIfAbsent(u, new ArrayList<>());
+    //         adj.putIfAbsent(v, new ArrayList<>());
+    //         adj.get(u).add(v);
+    //         adj.get(v).add(u);
+    //     }
+    //     // Apply BFS or DFS
+    //     int[] result = new int[n];
+    //     for (int i = 0; i < n; i++) {
+    //         result[i] = dfs(i, adj, k, -1);
+    //     }
+    //     return result;
+    // }
+
+    private int dfs(int currNode, HashMap<Integer, List<Integer>> adj, int k, int currParent) {
+        if (k < 0) return 0;
+        int count = 1; // Count the target nodes.
+        for (int node : adj.get(currNode)) {
+            if (node != currParent) count += dfs(node, adj, k - 1, currNode);
+        }
+        return count;
+    }
+}

@@ -1,0 +1,18 @@
+543. Diameter of Binary Tree
+
+class Solution {
+    private int dia = 0;
+    public int diameterOfBinaryTree(TreeNode root) {
+        dia = 0;
+        solve(root);
+        return dia;
+    }
+
+    public int solve(TreeNode root) {
+        if (root == null) return 0;
+        int left = solve(root.left);
+        int right = solve(root.right);
+        dia = Math.max(dia, left + right);
+        return 1 + Math.max(left, right);
+    }
+}

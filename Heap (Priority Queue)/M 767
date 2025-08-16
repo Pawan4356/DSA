@@ -1,0 +1,41 @@
+767. Reorganize String
+
+Given a string s, rearrange the characters of s so that any two adjacent characters are not the same.
+Return any possible rearrangement of s or return "" if not possible.
+
+Example 1:
+
+Input: s = "aab"
+Output: "aba"
+
+Example 2:
+
+Input: s = "aaab"
+Output: ""
+
+class Solution {
+    public String reorganizeString(String s) {
+        int n = s.length();
+        PriorityQueue<int[]> pq = new PriorityQueue<>((a, b) -> Integer.compare(b[0], a[0]));
+        StringBuilder str = new StringBuilder();
+        int[] freq = new int[26];
+        for (char i : s.toCharArray()) {
+            freq[i - 'a']++;
+            if (freq[i - 'a'] > (n + 1)/2) return "";
+        }
+        for (int i = 0; i < 26; i++) {
+            if (freq[i] > 0) pq.offer(new int[]{freq[i], i + 'a'});
+        }
+        int[] prev = new int[]{0, ' '};
+        while (!pq.isEmpty()) {
+            int[] curr = pq.poll();
+            str.append((char) curr[1]);
+            if (prev[0] > 0) {
+                pq.offer(prev);
+            }
+            curr[0]--;
+            prev = curr;
+        }
+        return str.toString();
+    }
+}

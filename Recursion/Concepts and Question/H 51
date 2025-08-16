@@ -1,0 +1,49 @@
+class Solution {
+    public List<List<String>> solveNQueens(int n) {
+        List<List<String>> result = new ArrayList<>();
+        char[][] nQueens = new char[n][n];
+        for (char[] row: nQueens) {
+            Arrays.fill(row, '.');
+        }
+        if (n < 0) return result;
+        solve(n, result, nQueens, 0);
+        return result;
+    }
+
+    private void solve(int n, List<List<String>> result, char[][] nQueens, int row) {
+        if (row == n) {
+            List<String> sol = new ArrayList<>();
+            for (char[] rowSol: nQueens) sol.add(new String(rowSol));
+            result.add(sol);
+            return;
+        }
+        for (int i = 0; i < n; i++) {
+            if (isValid(n, nQueens, row, i)) {
+                nQueens[row][i] = 'Q';
+                solve(n, result, nQueens, row + 1);
+                nQueens[row][i] = '.';
+            }
+        }
+    }
+
+    private boolean isValid(int n, char[][] nQueens, int row, int col) {
+        for (int i = row - 1; i >= 0; i--) {
+            if (nQueens[i][col] == 'Q') return false;
+        }
+        int di = row - 1;
+        int dj = col - 1;
+        while (di >= 0 && dj >= 0) {
+            if (nQueens[di][dj] == 'Q') return false;
+            di--;
+            dj--;
+        }
+        di = row - 1;
+        dj = col + 1;
+        while (di >= 0 && dj < n) {
+            if (nQueens[di][dj] == 'Q') return false;
+            di--;
+            dj++;
+        }
+        return true;
+    }
+}

@@ -1,0 +1,20 @@
+class Solution {
+    private Node prev = null;
+    private Node head = null;
+    
+    public Node flattenBST(Node root) {
+        if (root == null) return null;
+        inOrder(root);
+        return head;
+    }
+    
+    private void inOrder(Node node) {
+        if (node == null) return;
+        inOrder(node.left);
+        if (prev == null) head = node;
+        else prev.right = node;
+        node.left = null;
+        prev = node;
+        inOrder(node.right);
+    }
+}

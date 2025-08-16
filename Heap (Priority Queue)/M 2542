@@ -1,0 +1,73 @@
+2542. Maximum Subsequence Score
+
+You are given two 0-indexed integer arrays nums1 and nums2 of equal length n and a positive integer k. 
+You must choose a subsequence of indices from nums1 of length k.
+For chosen indices i0, i1, ..., ik - 1, your score is defined as:
+The sum of the selected elements from nums1 multiplied with the minimum of the selected elements from nums2.
+It can defined simply as: 
+(nums1[i0] + nums1[i1] +...+ nums1[ik - 1]) * min(nums2[i0] , nums2[i1], ... ,nums2[ik - 1]).
+Return the maximum possible score.
+A subsequence of indices of an array is a set that can be derived from the set 
+{0, 1, ..., n-1} by deleting some or no elements.
+
+Example 1:
+
+Input: nums1 = [1,3,3,2], nums2 = [2,1,3,4], k = 3
+Output: 12
+Explanation: 
+The four possible subsequence scores are:
+- We choose the indices 0, 1, and 2 with score = (1+3+3) * min(2,1,3) = 7.
+- We choose the indices 0, 1, and 3 with score = (1+3+2) * min(2,1,4) = 6. 
+- We choose the indices 0, 2, and 3 with score = (1+3+2) * min(2,3,4) = 12. 
+- We choose the indices 1, 2, and 3 with score = (3+3+2) * min(1,3,4) = 8.
+Therefore, we return the max score, which is 12.
+Example 2:
+
+Input: nums1 = [4,2,3,1,1], nums2 = [7,5,10,9,6], k = 1
+Output: 30
+Explanation: 
+Choosing index 2 is optimal: nums1[2] * nums2[2] = 3 * 10 = 30 is the maximum possible score.
+
+=====Recursive approach=====
+
+class Solution {
+    private PriorityQueue<Integer> pq = new PriorityQueue<>();
+    public long maxScore(int[] nums1, int[] nums2, int k) {
+        return sol(nums1, nums2, 0, Integer.MAX_VALUE, 0, 0, k, new PriorityQueue<>());
+    }
+    public long sol(int[] nums1, int[] nums2, int sum, int min, int i, int count, int k, PriorityQueue<Integer> pq) {
+        int n = nums1.length;
+        if (count == k) return sum * min;
+        if (i >= n) return 0;
+        pq.add(nums2[i]);
+        long taki = sol(nums1, nums2, sum + nums1[i], pq.peek(), i + 1, count + 1, k, pq);
+        pq.remove(nums2[i]);
+        long notaki = sol(nums1, nums2, sum, min, i + 1, count, k, pq);
+        return Math.max(taki, notaki);
+    }
+}
+
+=====Optimal Solution (Using Greedy approach)=====
+
+class Solution {
+    private PriorityQueue<Integer> pq = new PriorityQueue<>();
+    public long maxScore(int[] nums1, int[] nums2, int k) {
+        int n = nums1.length;
+        int[][] nums = new int[n][2];
+        for (int i = 0; i < n; i++) {
+            nums[i] = new int[]{nums2[i], nums1[i]};
+        }
+        Arrays.sort(nums, (a, b) -> Integer.compare(b[0], a[0]));
+        PriorityQueue<Integer> pq = new PriorityQueue<>();
+        long sum = 0, max = 0;
+        for (int i = 0; i < n; i++) {
+            int num1 = nums[i][1];
+            int num2 = nums[i][0];
+            sum += num1;
+            pq.add(num1);
+            if (pq.size() > k) sum -= pq.poll();
+            if (pq.size() == k) max = Math.max(max, sum * num2);
+        }
+        return max;
+    }
+}

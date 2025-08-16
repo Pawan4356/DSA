@@ -1,0 +1,83 @@
+1717. Maximum Score From Removing Substrings
+
+You are given a string s and two integers x and y. You can perform two types of 
+operations any number of times.
+Remove substring "ab" and gain x points.
+For example, when removing "ab" from "cabxbae" it becomes "cxbae".
+Remove substring "ba" and gain y points.
+For example, when removing "ba" from "cabxbae" it becomes "cabxe".
+Return the maximum points you can gain after applying the above operations on s.
+
+Example 1:
+
+Input: s = "cdbcbbaaabab", x = 4, y = 5
+Output: 19
+Explanation:
+- Remove the "ba" underlined in "cdbcbbaaabab". Now, s = "cdbcbbaaab" and 5 points are added to the score.
+- Remove the "ab" underlined in "cdbcbbaaab". Now, s = "cdbcbbaa" and 4 points are added to the score.
+- Remove the "ba" underlined in "cdbcbbaa". Now, s = "cdbcba" and 5 points are added to the score.
+- Remove the "ba" underlined in "cdbcba". Now, s = "cdbc" and 5 points are added to the score.
+Total score = 5 + 4 + 5 + 5 = 19.
+
+Example 2:
+
+Input: s = "aabbaaxybbaabb", x = 5, y = 4
+Output: 20
+
+class Solution {
+    public int maximumGain(String s, int x, int y) {
+        if (x > y) {
+            return abop(s, x, y);
+        } else {
+            return baop(s, x, y);
+        }
+    }
+
+    private int abop(String s, int x, int y) {
+        int score = 0;
+        StringBuilder sb = new StringBuilder();
+        for (char c : s.toCharArray()) {
+            sb.append(c);
+            int len = sb.length();
+            if (len >= 2 && sb.charAt(len - 2) == 'a' && sb.charAt(len - 1) == 'b') {
+                sb.delete(sb.length() - 2, sb.length());
+                score += x;
+            }
+        }
+        s = sb.toString();
+        sb = new StringBuilder();
+        for (char c : s.toCharArray()) {
+            sb.append(c);
+            int len = sb.length();
+            if (len >= 2 && sb.charAt(len - 2) == 'b' && sb.charAt(len - 1) == 'a') {
+                sb.delete(sb.length() - 2, sb.length());
+                score += y;
+            }
+        }
+        return score;
+    }
+
+    private int baop(String s, int x, int y) {
+        int score = 0;
+        StringBuilder sb = new StringBuilder();
+        for (char c : s.toCharArray()) {
+            sb.append(c);
+            int len = sb.length();
+            if (len >= 2 && sb.charAt(len - 2) == 'b' && sb.charAt(len - 1) == 'a') {
+                sb.delete(sb.length() - 2, sb.length());
+                score += y;
+            }
+        }
+        s = sb.toString();
+        sb = new StringBuilder();
+        for (char c : s.toCharArray()) {
+            sb.append(c);
+            int len = sb.length();
+            if (len >= 2 && sb.charAt(len - 2) == 'a' && sb.charAt(len - 1) == 'b') {
+                sb.delete(sb.length() - 2, sb.length());
+                score += x;
+            }
+        }
+        return score;
+    }
+}

@@ -1,0 +1,54 @@
+// My solution - No recursion
+
+class Solution {
+    Node flatten(Node root) {
+        if (root == null) return null;
+        Node head = root;
+        Node current = root.next;
+        while (current != null) {
+            Node temp = current;
+            while (temp != null) {
+                Node nextBottom = temp.bottom;
+                temp.bottom = null;
+                insertNode(head, temp);
+                temp = nextBottom;
+            }
+            current = current.next;
+        }
+        return head;
+    }
+
+    private void insertNode(Node head, Node newNode) {
+        if (newNode == null) return;
+        Node current = head;
+        while (current.bottom != null && current.bottom.data < newNode.data) {
+            current = current.bottom;
+        }
+        newNode.bottom = current.bottom;
+        current.bottom = newNode;
+    }
+}
+
+// Better - Full recursion
+
+class Solution {
+    Node flatten(Node root) {
+        if (root == null) return root;
+        Node temp = flatten(root.next);
+        return mergedList(root, temp);
+    }
+    
+    private Node mergedList(Node head1, Node head2) {
+        if (head1 == null) return head2;
+        if (head2 == null) return head1;
+        Node result;
+        if (head1.data > head2.data) {
+            result = head2;
+            result.bottom = mergedList(head1, head2.bottom);
+        } else {
+            result = head1;
+            result.bottom = mergedList(head2, head1.bottom);
+        }
+        return result;
+    }
+}

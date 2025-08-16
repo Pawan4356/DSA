@@ -1,0 +1,135 @@
+472. Concatenated Words
+
+Given an array of strings words (without duplicates), 
+return all the concatenated words in the given list of words.
+A concatenated word is defined as a string that is comprised 
+entirely of at least two shorter words (not necessarily distinct) in the given array.
+
+Example 1:
+
+Input: words = ["cat","cats","catsdogcats","dog","dogcatsdog","hippopotamuses","rat","ratcatdogcat"]
+Output: ["catsdogcats","dogcatsdog","ratcatdogcat"]
+Explanation: "catsdogcats" can be concatenated by "cats", "dog" and "cats"; 
+"dogcatsdog" can be concatenated by "dog", "cats" and "dog"; 
+"ratcatdogcat" can be concatenated by "rat", "cat", "dog" and "cat".
+
+Example 2:
+
+Input: words = ["cat","dog","catdog"]
+Output: ["catdog"]
+
+=====Failed Attempt=====
+
+class Solution {
+    public List<String> findAllConcatenatedWordsInADict(String[] words) {
+        List<String> result = new ArrayList<>();
+        Set<String> set = new HashSet<>();
+        for (String s : words) {
+            set.add(s);
+        }
+        for (int i = 0; i < words.length; i++) {
+            int n = words[i].length();
+            set.remove(words[i]);
+            for (int j = 0; j < n - 1; j++) {
+                String prefix = words[i].substring(0, j + 1);
+                String remaining = words[i].substring(j + 1, n);
+                if (set.contains(prefix) && check(remaining, set)) {
+                    result.add(words[i]);
+                }
+            }
+            set.add(words[i]);
+        }
+        return result;
+    }
+    private boolean check(String str, Set<String> set) {
+        int n = str.length();
+        if (n == 0) return true;
+        for (int j = 0; j < n - 1; j++) {
+            String prefix = str.substring(0, j + 1);
+            String remaining = str.substring(j + 1);
+            if (!set.contains(prefix) && !check(remaining, set)) {
+                return false;
+            }
+        }
+        return true;
+    }
+}
+
+Input
+words = ["cat","cats","catsdogcats","dog","dogcatsdog","hippopotamuses","rat","ratcatdogcat"]
+Output
+["cats","catsdogcats","catsdogcats","dogcatsdog","ratcatdogcat"]
+Expected
+["catsdogcats","dogcatsdog","ratcatdogcat"]
+
+=====Time limit exceeded=====
+
+class Solution {
+    public List<String> findAllConcatenatedWordsInADict(String[] words) {
+        List<String> result = new ArrayList<>();
+        Set<String> set = new HashSet<>();
+        for (String s : words) {
+            set.add(s);
+        }
+        for (int i = 0; i < words.length; i++) {
+            int n = words[i].length();
+            if (check(words[i], set)) {
+                result.add(words[i]);
+            }
+        }
+        return result;
+    }
+    private boolean check(String str, Set<String> set) {
+        int n = str.length();
+        if (n == 0) return true;
+        for (int j = 0; j < n - 1; j++) {
+            String prefix = str.substring(0, j + 1);
+            String remaining = str.substring(j + 1);
+            if ((set.contains(prefix) && check(remaining, set)) || (set.contains(prefix) && set.contains(remaining))) {
+                return true;
+            }
+        }
+        return false;
+    }
+}
+
+=====Final solution=====
+
+class Solution {
+    public List<String> findAllConcatenatedWordsInADict(String[] words) {
+        List<String> result = new ArrayList<>();
+        Set<String> set = new HashSet<>();
+        for (String s : words) {
+            set.add(s);
+        }
+        for (String s : words) {
+            set.remove(s);
+            if (check(s, set)) {
+                result.add(s);
+            }
+            set.add(s);
+        }
+        return result;
+    }
+    private boolean check(String str, Set<String> set) {
+        int n = str.length();
+        if (n == 0) return true; // Base case: empty string can always be formed
+
+        // Dynamic programming array
+        boolean[] dp = new boolean[n + 1];
+        dp[0] = true; // Base case: empty prefix can always be formed
+
+        // Fill the DP array
+        for (int i = 1; i <= n; i++) { // Iterate over every length of prefix
+            for (int j = 0; j < i; j++) { // Check all possible splits for prefix [0:i)
+                // If prefix [0:j) can be formed and [j:i) is in the set
+                if (dp[j] && set.contains(str.substring(j, i))) {
+                    dp[i] = true; // Mark prefix [0:i) as formable
+                    break; // No need to check further splits for this `i`
+                }
+            }
+        }
+
+        return dp[n]; // Return if the entire string can be formed
+    }
+}

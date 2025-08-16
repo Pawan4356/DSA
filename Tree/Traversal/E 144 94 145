@@ -1,0 +1,184 @@
+144. Binary Tree Preorder Traversal
+94. Binary Tree Inorder Traversal
+145. Binary Tree Postorder Traversal
+
+Given the root of a binary tree, return the traversal of its nodes values.
+
+===== Definition for a binary tree node. =====
+
+public class TreeNode {
+    int val;
+    TreeNode left;
+    TreeNode right;
+    TreeNode() {}
+    TreeNode(int val) { this.val = val; }
+    TreeNode(int val, TreeNode left, TreeNode right) {
+        this.val = val;
+        this.left = left;
+        this.right = right;
+    }
+}
+
+===== Recursive =====
+
+// PreOrder
+
+class Solution {
+    public List<Integer> preorderTraversal(TreeNode root) {
+        List<Integer> result = new ArrayList<>();
+        solve(root, result);
+        return result;
+    }
+    private void solve(TreeNode root, List<Integer> result) {
+        if (root == null) return;
+        result.add(root.val);
+        solve(root.left, result);
+        solve(root.right, result);
+    }
+}
+
+// InOrder
+
+class Solution {
+    public List<Integer> inorderTraversal(TreeNode root) {
+        List<Integer> list = new ArrayList<>();
+        traversal(root, list);
+        return list;
+    }
+    private static void traversal(TreeNode root, List<Integer> list) {
+        if (root == null) return;
+        traversal(root.left, list);
+        list.add(root.val);
+        traversal(root.right, list);
+    }
+}
+
+// PostOrder
+
+class Solution {
+    public List<Integer> postorderTraversal(TreeNode root) {
+        List<Integer> result = new ArrayList<>();
+        solve(root, result);
+        return result;
+    }
+    private void solve(TreeNode root, List<Integer> result) {
+        if (root == null) return;
+        solve(root.left, result);
+        solve(root.right, result);
+        result.add(root.val);
+    }
+}
+
+===== Iterative =====
+
+// PreOrder
+
+class Solution {
+    public List<Integer> preorderTraversal(TreeNode root) {
+        Stack<TreeNode> st = new Stack<>();
+        List<Integer> result = new ArrayList<>();
+        if (root == null) return result;
+        st.push(root);
+        while (!st.isEmpty()) {
+            int len = st.size();
+            for (int i = 0; i < len; i++) {
+                TreeNode curr = st.pop();
+                result.add(curr.val);
+                if (curr.right != null) st.push(curr.right);
+                if (curr.left != null) st.push(curr.left);
+            }
+        }
+        return result;
+    }
+}
+
+// InOrder
+
+class Solution {
+    public List<Integer> inorderTraversal(TreeNode root) {
+        Stack<TreeNode> st = new Stack<>();
+        List<Integer> list = new ArrayList<>();
+        if (root == null) return list;
+        TreeNode curr = root;
+        while (true) {
+            if (curr != null) {
+                st.push(curr);
+                curr = curr.left;
+            } else {
+                if (st.isEmpty()) break;
+                curr = st.pop();
+                list.add(curr.val);
+                curr = curr.right;
+            }
+        }
+        return list;
+    }
+}
+
+// PostOrder
+
+// Using 2 stacks
+
+class Solution {
+    public List<Integer> postorderTraversal(TreeNode root) {
+        Stack<TreeNode> st1 = new Stack<>();
+        Stack<TreeNode> st2 = new Stack<>();
+        List<Integer> result = new ArrayList<>();
+        if  (root == null) return result;
+        st1.push(root);
+        while (!st1.isEmpty()) {
+            TreeNode curr = st1.pop();
+            st2.push(curr);
+            if (curr.left != null) st1.push(curr.left);
+            if (curr.right != null) st1.push(curr.right);
+        }
+        while (!st2.isEmpty()) {
+            result.add(st2.pop().val);
+        }
+        return result;
+    }
+}
+
+// Using one stack
+
+class Solution {
+    public List<Integer> postorderTraversal(TreeNode root) {
+        Stack<TreeNode> st1 = new Stack<>();
+        List<Integer> result = new ArrayList<>();
+        if  (root == null) return result;
+        st1.push(root);
+        while (!st1.isEmpty()) {
+            TreeNode curr = st1.pop();
+            result.add(0, curr.val);
+            if (curr.left != null) st1.push(curr.left);
+            if (curr.right != null) st1.push(curr.right);
+        }
+        return result;
+    }
+}
+
+// OR
+
+class Solution {
+    public List<Integer> postorderTraversal(TreeNode root) {
+        Stack<TreeNode> st = new Stack<>();
+        List<Integer> result = new ArrayList<>();
+        if  (root == null) return result;
+        TreeNode prev = null;
+        while (root != null || !st.isEmpty()) {
+            while (root != null) {
+                st.push(root);
+                root = root.left;
+            }
+            TreeNode temp = st.peek();
+            if (temp.right == null || temp.right == prev) {
+                result.add(temp.val);
+                st.pop();
+                prev = temp;
+            } else {
+                root = temp.right;
+            }
+        }
+        return result;
+    }
+}

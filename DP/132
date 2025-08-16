@@ -1,0 +1,82 @@
+1014. Best Sightseeing Pair
+
+You are given an integer array values where values[i] represents the value of the ith sightseeing spot. 
+Two sightseeing spots i and j have a distance j - i between them.
+The score of a pair (i < j) of sightseeing spots is : the sum of the values of the sightseeing spots, 
+minus the distance between them.
+Return the maximum score of a pair of sightseeing spots.
+In Questions like these where we have a relationship between index and the elements 
+try putting similar elements together
+Here, (values[i] + i) + (values[j] - j)
+
+Example 1:
+Input: values = [8,1,5,2,6]
+Output: 11
+Explanation: i = 0, j = 2, values[i] + values[j] + i - j = 8 + 5 + 0 - 2 = 11
+
+Example 2:
+Input: values = [1,2]
+Output: 2
+
+=====Brute Force=====
+=====Time limit exceeded=====
+
+class Solution {
+    public int maxScoreSightseeingPair(int[] values) {
+        int max = Integer.MIN_VALUE;
+        for(int i = 0; i < values.length - 1; i++) {
+            for(int j = i + 1; j < values.length; j++) {
+                if(i >= j) {
+                    continue;
+                } else if(max < values[i] + values[j] + i - j) {
+                    max = values[i] + values[j] + i - j;
+                }
+            }
+        }
+        return max;
+    }
+}
+
+=====Using An array to keep the track of Max value of values[i] + i=====
+
+class Solution {
+    public int maxScoreSightseeingPair(int[] values) {
+        int maxarri[] = new int[values.length];
+        int maxj = values[1] - 1 + values[0];
+        maxarri[0] = values[0];
+        for(int i = 1; i < values.length - 1; i++) {
+            if(values[i] + i > maxarri[i-1]) {
+                maxarri[i] = values[i] + i;
+            } else {
+                maxarri[i] = maxarri[i-1];
+            }
+        }
+        for(int j = 2; j < values.length; j++) {
+            if(values[j] - j + maxarri[j-1]> maxj) {
+                maxj = values[j] - j + maxarri[j-1];
+            }
+        }
+        return maxj;
+    }
+}
+
+=====Without using An array to keep the track of Max value of values[i] + i=====
+
+class Solution {
+    public int maxScoreSightseeingPair(int[] values) {
+        int maxi = values[0];
+        int maxj = values[1] - 1 + values[0];
+        if(maxi < values[1] + 1) {
+            maxi = values[1] + 1;
+        }
+        for(int j = 2; j < values.length; j++) {
+            if(maxi < values[j-1] + j - 1) {
+                maxi = values[j-1] + j - 1;
+            }
+            if(values[j] - j + maxi > maxj) {
+                maxj = values[j] - j + maxi;
+            }
+        }
+        return maxj;
+    }
+}

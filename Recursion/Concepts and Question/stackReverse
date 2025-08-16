@@ -1,0 +1,17 @@
+class Solution {
+    static void reverse(Stack<Integer> s) {
+        if (s.isEmpty()) return;
+        int top = s.pop();
+        reverse(s);
+        insertBottom(s, top);
+    }
+    private static void insertBottom(Stack<Integer> s, int n) {
+        if (s.isEmpty()) {
+            s.add(n);
+            return;
+        }
+        int top = s.pop();
+        insertBottom(s, n);
+        s.add(top);
+    }
+}

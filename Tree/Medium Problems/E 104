@@ -1,0 +1,19 @@
+104. Maximum Depth of Binary Tree
+
+class Solution {
+    private int level = 0;
+    public int maxDepth(TreeNode root) {
+        if (root == null) return 0;
+        solve(root, 0);
+        return level;
+    }
+
+    private void solve(TreeNode node, int currLvl) {
+        if (node == null) {
+            if (currLvl > level) level = currLvl;
+            return;
+        }
+        solve(node.left, currLvl + 1);
+        solve(node.right, currLvl + 1);
+    }
+}

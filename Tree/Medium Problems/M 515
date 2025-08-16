@@ -1,0 +1,68 @@
+515. Find Largest Value in Each Tree Row
+Given the root of a binary tree, return an array of the largest value in each row of the tree (0-indexed).
+
+
+Definition for a binary tree node.
+public class TreeNode {
+    int val;
+    TreeNode left;
+    TreeNode right;
+    TreeNode() {}
+    TreeNode(int val) { this.val = val; }
+    TreeNode(int val, TreeNode left, TreeNode right) {
+        this.val = val;
+        this.left = left;
+        this.right = right;
+    }
+}
+
+=====BFS=====
+
+class Solution {
+    public List<Integer> largestValues(TreeNode root) {
+        if(root == null) {
+            return new ArrayList<>();
+        }
+        List<Integer> result = new ArrayList<Integer>();
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.add(root);
+        while(!queue.isEmpty()) {
+            int level = queue.size();
+            int max = Integer.MIN_VALUE;
+            for(int i = 0; i < level; i++) {
+                TreeNode current = queue.poll();
+                max = Math.max(max, current.val);
+                if(current.left != null) {
+                    queue.add(current.left);
+                }
+                if(current.right != null) {
+                    queue.add(current.right);
+                }
+            }
+            result.add(max);
+        }
+        return result;
+    }
+}
+
+=====DFS=====
+
+class Solution {
+    private List<Integer> result = new ArrayList<>();
+    public List<Integer> largestValues(TreeNode root) {
+        DFS(root, 0);
+        return result;
+    }
+    public void DFS(TreeNode root, int depth) {
+        if(root == null) {
+            return;
+        }
+        if(depth == result.size()) {
+            result.add(root.val);
+        } else {
+            result.set(depth, Math.max(result.get(depth), root.val));
+        }
+        DFS(root.left, depth + 1);
+        DFS(root.right, depth + 1);
+    }
+}

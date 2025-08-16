@@ -1,0 +1,24 @@
+class Solution {
+    private Node head = null;
+    private Node temp = null;
+    
+    Node bToDLL(Node root) {
+        if (root == null) return null;
+        dll(root);
+        return head;
+    }
+    
+    private void dll(Node node) {
+        if (node == null) return;
+        dll(node.left);
+        if (head == null) {
+            head = node;
+            temp = node;
+        } else {
+            temp.right = node;
+            node.left = temp;
+            temp = temp.right;
+        }
+        dll(node.right);
+    }
+}

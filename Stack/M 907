@@ -1,0 +1,58 @@
+
+
+=====O(n^3)=====
+
+Use 3 for loops to find the minimum and the subarray iteration.
+
+=====O(n^2)=====
+
+class Solution {
+    private static final long MOD = 1000000007L;
+    public int sumSubarrayMins(int[] arr) {
+        int n = arr.length;
+        long result = 0;
+        for (int i = 0; i < n; i++) {
+            int left = 1, right = 1;
+            for (int j = i - 1; j >= 0 && arr[j] > arr[i]; j--) {
+                left++;
+            }
+            for (int j = i + 1; j < n && arr[j] >= arr[i]; j++) {
+                right++;
+            }
+            result = (result + (long) arr[i] * left * right) % MOD;
+        }
+        return (int) result;
+    }
+}
+
+=====O(n) using stack=====
+
+class Solution {
+    private static final int MOD = 1000000007;
+    public int sumSubarrayMins(int[] arr) {
+        int n = arr.length;
+        long result = 0;
+        Stack<Integer> stack = new Stack<>();
+        int[] left = new int[n];
+        int[] right = new int[n];
+        for (int i = 0; i < n; i++) {
+            while (!stack.isEmpty() && arr[stack.peek()] > arr[i]) {
+                stack.pop();
+            }
+            left[i] = stack.isEmpty() ? i + 1 : i - stack.peek();
+            stack.push(i);
+        }
+        stack.clear();
+        for (int i = n - 1; i >= 0; i--) {
+            while (!stack.isEmpty() && arr[stack.peek()] >= arr[i]) {
+                stack.pop();
+            }
+            right[i] = stack.isEmpty() ? n - i : stack.peek() - i;
+            stack.push(i);
+        }
+        for (int i = 0; i < n; i++) {
+            result = (result + (long) arr[i] * left[i] * right[i]) % MOD;
+        }
+        return (int) result;
+    }
+}

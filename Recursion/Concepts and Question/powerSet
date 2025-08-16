@@ -1,0 +1,19 @@
+class Solution {
+    public List<String> AllPossibleStrings(String s) {
+        List<String> result = new ArrayList<>();
+        int n = s.length();
+        if (n == 0) return result;
+        solve(result, s, "", 0);
+        Collections.sort(result);
+        return result;
+    }
+    
+    private void solve(List<String> result, String str, String temp, int ind) {
+        if (ind == str.length()) {
+            result.add(temp);
+            return;
+        }
+        solve(result, str, temp + str.charAt(ind), ind + 1);
+        solve(result, str, temp, ind + 1);
+    }
+}

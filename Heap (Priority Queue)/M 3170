@@ -1,0 +1,88 @@
+3170. Lexicographically Minimum String After Removing Stars
+
+You are given a string s. It may contain any number of '*' characters. Your task is to remove all '*' 
+characters. While there is a '*', do the following operation:
+Delete the leftmost '*' and the smallest non-'*' character to its left. If there are several smallest 
+characters, you can delete any of them.
+Return the lexicographically smallest resulting string after removing all '*' characters.
+
+Example 1:
+Input: s = "aaba*"
+Output: "aab"
+Explanation:
+We should delete one of the 'a' characters with '*'. If we choose s[3], s becomes the lexicographically 
+smallest.
+
+Example 2:
+Input: s = "abc"
+Output: "abc"
+Explanation:
+There is no '*' in the string.
+
+===== Not the best solution but a try (Not Working) =====
+
+import java.util.*;
+
+class Solution {
+    public String clearStars(String s) {
+        Deque<Character> stack = new ArrayDeque<>();
+        int[] freq = new int[26]; // frequency of each character
+        for (char ch : s.toCharArray()) {
+            if (ch != '*') {
+                stack.push(ch);
+                freq[ch - 'a']++;
+            } else {
+                // Find the smallest lexicographical character
+                for (int i = 0; i < 26; i++) {
+                    if (freq[i] > 0) {
+                        char toRemove = (char) (i + 'a');
+                        freq[i]--;
+                        // Remove from stack (first occurrence from top)
+                        Deque<Character> temp = new ArrayDeque<>();
+                        while (!stack.isEmpty()) {
+                            char top = stack.pop();
+                            if (top == toRemove)
+                                break;
+                            temp.push(top);
+                        }
+                        // Restore other characters
+                        while (!temp.isEmpty()) {
+                            stack.push(temp.pop());
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+        StringBuilder result = new StringBuilder();
+        for (Character ch : stack) {
+            result.append(ch);
+        }
+        return result.reverse().toString();
+    }
+}
+
+===== A lot better =====
+
+class Solution {
+    public String clearStars(String s) {
+        int n = s.length();
+        char[] c = s.toCharArray();
+        PriorityQueue<int[]> pq = new PriorityQueue<>((a, b) -> a[1] == b[1] ? Integer.compare(b[0], a[0]) : Integer.compare(a[1], b[1]));
+        for (int i = 0; i < n; i++) {
+            if (c[i] == '*') {
+                if (!pq.isEmpty()) {
+                    int[] t = pq.poll();
+                    c[t[0]] = '*';
+                }
+            } else {
+                pq.offer(new int[]{i, c[i] - 'a'});
+            }
+        }
+        StringBuilder str = new StringBuilder();
+        for (char i : c) {
+            if (i != '*') str.append(i);
+        }
+        return str.toString();
+    }
+}

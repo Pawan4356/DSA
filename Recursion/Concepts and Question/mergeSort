@@ -1,0 +1,29 @@
+import java.util.Arrays;
+
+class Solution {
+    void mergeSort(int arr[], int l, int r) {
+        if (l >= r) return;
+        int mid = l + (r - l) / 2;
+        mergeSort(arr, l, mid);
+        mergeSort(arr, mid + 1, r);
+        merge(arr, l, mid, r);
+    }
+    private void merge(int arr[], int l, int mid, int r) {
+        int[] temp1 = Arrays.copyOfRange(arr, l, mid + 1);
+        int[] temp2 = Arrays.copyOfRange(arr, mid + 1, r + 1);
+        int i = 0, j = 0, k = l;
+        while (i < temp1.length && j < temp2.length) {
+            if (temp1[i] <= temp2[j]) {
+                arr[k++] = temp1[i++];
+            } else {
+                arr[k++] = temp2[j++];
+            }
+        }
+        while (i < temp1.length) {
+            arr[k++] = temp1[i++];
+        }
+        while (j < temp2.length) {
+            arr[k++] = temp2[j++];
+        }
+    }
+}

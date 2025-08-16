@@ -1,0 +1,118 @@
+2131. Longest Palindrome by Concatenating Two Letter Words
+
+You are given an array of strings words. Each element of words consists of two lowercase English letters.
+Create the longest possible palindrome by selecting some elements from words and concatenating them in 
+any order. Each element can be selected at most once.
+Return the length of the longest palindrome that you can create. If it is impossible to create any palindrome,
+return 0.
+A palindrome is a string that reads the same forward and backward.
+
+Example 1:
+Input: words = ["lc","cl","gg"]
+Output: 6
+Explanation: One longest palindrome is "lc" + "gg" + "cl" = "lcggcl", of length 6.
+Note that "clgglc" is another longest palindrome that can be created.
+
+Example 2:
+Input: words = ["ab","ty","yt","lc","cl","ab"]
+Output: 8
+Explanation: One longest palindrome is "ty" + "lc" + "cl" + "yt" = "tylcclyt", of length 8.
+Note that "lcyttycl" is another longest palindrome that can be created.
+
+Example 3:
+Input: words = ["cc","ll","xx"]
+Output: 2
+Explanation: One longest palindrome is "cc", of length 2.
+Note that "ll" is another longest palindrome that can be created, and so is "xx".
+
+=====Using HashMap=====
+
+class Solution {
+    public int longestPalindrome(String[] words) {
+        Map<String, Integer> map = new HashMap<>();
+        int result = 0;
+        for (String word : words) {
+            String reversed = new StringBuilder(word).reverse().toString();
+
+            if (map.getOrDefault(reversed, 0) > 0) {
+                result += 4;
+                map.put(reversed, map.get(reversed) - 1);
+            } else {
+                map.put(word, map.getOrDefault(word, 0) + 1);
+            }
+        }
+        // Check for a word with both characters same to use in the center
+        for (Map.Entry<String, Integer> entry : map.entrySet()) {
+            String word = entry.getKey();
+            int count = entry.getValue();
+
+            if (word.charAt(0) == word.charAt(1) && count > 0) {
+                result += 2;
+                break;
+            }
+        }
+        return result;
+    }
+}
+
+=====Using Flag=====
+
+class Solution {
+    public int longestPalindrome(String[] words) {
+        int n = words.length;
+        boolean[] used = new boolean[n];
+        int length = 0;
+        for (int i = 0; i < n - 1; i++) {
+            if (used[i]) continue;
+            for (int j = i + 1; j < n; j++) {
+                if (!used[j] && isReverse(words[i], words[j])) {
+                    used[i] = used[j] = true;
+                    length += 4;
+                    break;
+                }
+            }
+        }
+        for (int i = 0; i < n; i++) {
+            if (!used[i] && isPalindrome(words[i])) {
+                length += 2;
+                break;
+            }
+        }
+        return length;
+    }
+
+    public boolean isPalindrome(String a) {
+        return a.charAt(0) == a.charAt(1);
+    }
+
+    public boolean isReverse(String a, String b) {
+        return a.charAt(0) == b.charAt(1) && a.charAt(1) == b.charAt(0);
+    }
+}
+
+=====Optimal=====
+
+class Solution {
+    public int longestPalindrome(String[] words) {
+        int n = words.length;
+        int[][] freq = new int[26][26];
+        int length = 0;
+        for (int i = 0; i < n; i++) {
+            int a = words[i].charAt(0) - 'a';
+            int b = words[i].charAt(1) - 'a';
+            if (freq[b][a] > 0) {
+                freq[b][a]--;
+                length += 4;
+            } else {
+                freq[a][b]++;
+            }
+        }
+        for (int i = 0; i < 26; i++) {
+            if (freq[i][i] > 0) {
+                length += 2;
+                break;
+            }
+        }
+        return length;
+    }
+}

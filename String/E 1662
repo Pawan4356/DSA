@@ -1,0 +1,62 @@
+1662. Check If Two String Arrays are Equivalent
+
+Given two string arrays word1 and word2, return true if the two arrays represent the same string, 
+and false otherwise.
+A string is represented by an array if the array elements concatenated in order forms the string.
+
+
+Example 1:
+
+Input: word1 = ["ab", "c"], word2 = ["a", "bc"]
+Output: true
+Explanation:
+word1 represents string "ab" + "c" -> "abc"
+word2 represents string "a" + "bc" -> "abc"
+The strings are the same, so return true.
+
+Example 2:
+
+Input: word1 = ["a", "cb"], word2 = ["ab", "c"]
+Output: false
+
+Example 3:
+
+Input: word1  = ["abc", "d", "defg"], word2 = ["abcddefg"]
+Output: true
+
+=====Using StringBuilder=====
+
+class Solution {
+    public boolean arrayStringsAreEqual(String[] word1, String[] word2) {
+        StringBuilder w1 = new StringBuilder();
+        for (String s : word1) {
+            w1.append(s);
+        }
+        StringBuilder w2 = new StringBuilder();
+        for (String s : word2) {
+            w2.append(s);
+        }
+        //The StringBuilder.equals method does not compare the actual contents of the StringBuilder objects. 
+        //Instead, it checks if the two StringBuilder objects are the same instance, which is not what you want.
+        //To compare the actual contents of the two StringBuilder objects, you need to convert them to String 
+        //objects using the toString method.
+        return w1.toString().equals(w2.toString());
+    }
+}
+
+=====Without StringBuilder=====
+
+class Solution {
+    public boolean arrayStringsAreEqual(String[] word1, String[] word2) {
+        String w1 = "";
+        for (String s : word1) {
+            w1 += s;
+        }
+        String w2 = "";
+        for (String s : word2) {
+            w2 += s;
+        }
+        return w1.equals(w2);
+    }
+}
+

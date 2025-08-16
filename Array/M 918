@@ -1,0 +1,82 @@
+918. Maximum Sum Circular Subarray
+
+Given a circular integer array nums of length n, return the maximum possible sum of a non-empty subarray of nums.
+A circular array means the end of the array connects to the beginning of the array. 
+Formally, the next element of nums[i] is nums[(i + 1) % n] and the previous element of nums[i] 
+is nums[(i - 1 + n) % n].
+A subarray may only include each element of the fixed buffer nums at most once. 
+Formally, for a subarray nums[i], nums[i + 1], ..., nums[j], there does not exist i <= k1, k2 <= j 
+with k1 % n == k2 % n.
+
+
+Example 1:
+
+Input: nums = [1,-2,3,-2]
+Output: 3
+Explanation: Subarray [3] has maximum sum 3.
+
+Example 2:
+
+Input: nums = [5,-3,5]
+Output: 10
+Explanation: Subarray [5,5] has maximum sum 5 + 5 = 10.
+
+Example 3:
+
+Input: nums = [-3,-2,-3]
+Output: -2
+Explanation: Subarray [-2] has maximum sum -2.
+
+=====Brute Force=====
+
+class Solution {
+    public int maxSubarraySumCircular(int[] nums) {
+        int n = nums.length;
+        int result = Integer.MIN_VALUE;
+        for (int i = 0; i < n; i++) {
+            int sum = kadane(nums, n);
+            result = Math.max(result, sum);
+            rotateArr(nums, n);
+        }
+        return result;
+    }
+    private int kadane(int[] arr, int n) {
+        int max = arr[0];
+        int sum = arr[0];
+        for (int i = 1; i < n; i++) {
+            sum += arr[i];
+            if (sum > max) {
+                max = sum;
+            }
+            if (sum < 0) {
+                sum = 0;
+            }
+        }
+        return max;
+    }
+    private void rotateArr(int[] arr, int n) {
+        int temp = arr[0];
+        for (int i = 0; i < n - 1; i++) {
+            arr[i] = arr[i + 1];
+        }
+        arr[n -1] = temp;
+    }
+}
+
+=====Optimal Solution=====
+
+class Solution {
+    public int maxSubarraySumCircular(int[] nums) {
+        int totalSum = 0;
+        int maxSum = Integer.MIN_VALUE, currentMax = 0;
+        int minSum = Integer.MAX_VALUE, currentMin = 0;
+        for (int num : nums) {
+            currentMax = Math.max(currentMax + num, num);
+            maxSum = Math.max(maxSum, currentMax);
+            currentMin = Math.min(currentMin + num, num);
+            minSum = Math.min(minSum, currentMin);
+            totalSum += num;
+        }
+        return maxSum > 0 ? Math.max(maxSum, totalSum - minSum) : maxSum;
+    }
+}
