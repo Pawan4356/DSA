@@ -1,0 +1,76 @@
+Given an integer array nums, return an array answer such that answer[i] is equal to the product of all the elements of nums except nums[i].
+
+The product of any prefix or suffix of nums is guaranteed to fit in a 32-bit integer.
+
+You must write an algorithm that runs in O(n) time and without using the division operation.
+
+ 
+
+Example 1:
+
+Input: nums = [1,2,3,4]
+Output: [24,12,8,6]
+Example 2:
+
+Input: nums = [-1,1,0,-3,3]
+Output: [0,0,9,0,0]
+ 
+
+Constraints:
+
+2 <= nums.length <= 105
+-30 <= nums[i] <= 30
+The input is generated such that answer[i] is guaranteed to fit in a 32-bit integer.
+ 
+
+Follow up: Can you solve the problem in O(1) extra space complexity? (The output array does not count as extra space for space complexity analysis.)
+
+
+class Solution {
+public:
+    vector<int> productExceptSelf(vector<int>& nums) {
+        int len = nums.size();
+        if (len == 2) return vector<int>{nums[1], nums[0]};
+        vector<int> result;
+        vector<int> ahead;
+        stack<int> st;
+        st.push(nums[len - 1]);
+        for (int i = len - 2; i > 0; i--) {
+            st.push(nums[i] * st.top());
+        }
+        while (st.size()) {
+            ahead.push_back(st.top());
+            st.pop();
+        }
+        int back = nums[0];
+        result.push_back(ahead[0]);
+        for (int i = 1; i < len - 1; i++) {
+            result.push_back(back * ahead[i]);
+            back *= nums[i];
+        }
+        result.push_back(back);
+        return result;
+    }
+};
+
+
+class Solution {
+public:
+    vector<int> productExceptSelf(vector<int>& nums) {
+        int len = nums.size();
+        if (len == 2) return vector<int>{nums[1], nums[0]};
+        vector<int> result;
+        result.resize(len);
+        result[len - 2] = nums[len - 1];
+        for (int i = len - 3; i >= 0; i--) {
+            result[i] = result[i + 1] * nums[i + 1];
+        }
+        int back = nums[0];
+        for (int i = 1; i < len - 1; i++) {
+            result[i] *= back;
+            back *= nums[i];
+        }
+        result[len - 1] = back;
+        return result;
+    }
+};
