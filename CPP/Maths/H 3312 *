@@ -1,0 +1,132 @@
+3312. Sorted GCD Pair Queries
+
+You are given an integer array nums of length n and an integer array queries.
+Let gcdPairs denote an array obtained by calculating the GCD of all possible pairs (nums[i], nums[j]), where 0 <= i < j < n, and then sorting these values in ascending order.
+For each query queries[i], you need to find the element at index queries[i] in gcdPairs.
+Return an integer array answer, where answer[i] is the value at gcdPairs[queries[i]] for each query.
+The term gcd(a, b) denotes the greatest common divisor of a and b.
+
+
+Example 1:
+
+Input: nums = [2,3,4], queries = [0,2,2]
+
+Output: [1,2,2]
+
+Explanation:
+
+gcdPairs = [gcd(nums[0], nums[1]), gcd(nums[0], nums[2]), gcd(nums[1], nums[2])] = [1, 2, 1].
+
+After sorting in ascending order, gcdPairs = [1, 1, 2].
+
+So, the answer is [gcdPairs[queries[0]], gcdPairs[queries[1]], gcdPairs[queries[2]]] = [1, 2, 2].
+
+Example 2:
+
+Input: nums = [4,4,2,1], queries = [5,3,1,0]
+
+Output: [4,2,1,1]
+
+Explanation:
+
+gcdPairs sorted in ascending order is [1, 1, 1, 2, 2, 4].
+
+Example 3:
+
+Input: nums = [2,2], queries = [0,0]
+
+Output: [2,2]
+
+Explanation:
+
+gcdPairs = [2].
+
+Constraints:
+
+2 <= n == nums.length <= 105
+1 <= nums[i] <= 5 * 104
+1 <= queries.length <= 105
+0 <= queries[i] < n * (n - 1) / 2
+
+
+
+class Solution {
+public:
+    vector<int> gcdValues(vector<int>& nums, vector<long long>& queries) {
+        int len = nums.size();
+        int qlen = queries.size();
+        vector<int> gcdPairs;
+        for (int i = 0; i < len - 1; i++) {
+            for (int j = i + 1; j < len; j++) {
+                gcdPairs.push_back(gcd(nums[i], nums[j]));
+            }
+        }
+        sort(gcdPairs.begin(), gcdPairs.end());
+        vector<int> answer;
+        for (int i = 0; i < qlen; i++) {
+            answer.push_back(gcdPairs[queries[i]]);
+        }
+        return answer;
+    }
+};
+
+
+class Solution {
+public:
+    vector<int> gcdValues(vector<int>& nums, vector<long long>& queries) {
+        int n = nums.size();
+        int maxVal = *max_element(begin(nums), end(nums));
+
+        vector<int> divisorFreq(maxVal+1, 0);
+        for(int i = 0; i < n; i++) { //N*sqrt(maxVal)
+            int num = nums[i]; //36
+
+            for(int j = 1; j*j <= num; j++) {
+                if(num % j == 0) {
+                    divisorFreq[j]++;
+                    if(num/j != j) {
+                        divisorFreq[num/j]++;
+                    }
+                }
+            }
+        }
+
+        vector<long long> pairsWithGcd(maxVal+1, 0);
+        for(int g = maxVal; g >= 1; g--) {
+            long long count = divisorFreq[g];
+            //nC2
+            pairsWithGcd[g] = count * (count-1)/2;
+
+            //Correction time
+            for(int mult = 2*g; mult <= maxVal; mult += g) {
+                pairsWithGcd[g] -= pairsWithGcd[mult];
+            }    
+        }
+
+        vector<long long> prefixCountGcd(maxVal+1, 0);
+        for(int g = 1; g <= maxVal; g++) {
+            prefixCountGcd[g] = prefixCountGcd[g-1] + pairsWithGcd[g];
+        }
+
+        vector<int> result;
+
+        for(long long idx : queries) { //O(Q * log(maxVal))
+            int l = 1;
+            int r = maxVal;
+            int temp = 1;
+            while(l <= r) {
+                int mid_gcd = l + (r-l)/2;
+
+                if(prefixCountGcd[mid_gcd] > idx) {
+                    temp = mid_gcd;
+                    r = mid_gcd-1;
+                } else {
+                    l = mid_gcd+1;
+                }
+            }
+
+            result.push_back(temp);
+        }
+        return result;
+    }
+};
