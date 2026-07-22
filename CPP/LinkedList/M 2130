@@ -61,7 +61,7 @@ public:
             all_vals.push_back(curr->val);
             curr = curr->next;
         }
-        int len = all_vals.size(), max = -2147483648;
+        int len = all_vals.size(), max = 0;
         for (int i = 0; i < len/2; i++) {
             int curr_f = all_vals[i], curr_b = all_vals[len - 1 - i];
             if (max < curr_f + curr_b) max = curr_f + curr_b;
