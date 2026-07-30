@@ -1,0 +1,23 @@
+class Solution {
+public:
+    string smallestPalindrome(string s, int k) {
+        int len = s.length();
+        string half = s.substr(0, len / 2);
+        string result = "";
+        sort(half.begin(), half.end());
+        for (int i = 0; i < k - 1; i++) {
+            if (!next_permutation(half.begin(), half.end())) {
+                return result;
+            }
+        }
+        result += half;
+        if (len % 2 != 0) {
+            result += s[len / 2];
+        }
+        reverse(half.begin(), half.end());
+        result += half;
+        return result;
+    }
+};
+
+
