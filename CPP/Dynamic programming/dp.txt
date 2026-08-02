@@ -1,0 +1,21 @@
+Memoization - Top down
+
+Steps:
+1) Declare an array; (Not required everytime, sometimes variables are enough!!)
+2) Store the answer of every sub-problem;
+3) Checking if the sub-problem was previously solved;
+
+Tabulation - Bottom up
+
+Identification:
+- Number of ways
+- All possible ways
+- Best way
+- Min-Max
+
+Approach:
+- Try to represent the problem in terms of index
+- Do all possible stuff on that index according to the problem statement
+- Count all ways - sum of all stuffs
+  Minimum - minimum of all stuffs
+  Maximum - maximum of all stuffs
