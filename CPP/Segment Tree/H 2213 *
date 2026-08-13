@@ -1,0 +1,193 @@
+2213. Longest Substring of One Repeating Character
+
+You are given a 0-indexed string s. You are also given a 0-indexed string queryCharacters of length k and a 0-indexed array of integer indices queryIndices of length k, both of which are used to describe k queries.
+The ith query updates the character in s at index queryIndices[i] to the character queryCharacters[i].
+Return an array lengths of length k where lengths[i] is the length of the longest substring of s consisting of only one repeating character after the ith query is performed.
+
+Example 1:
+
+Input: s = "babacc", queryCharacters = "bcb", queryIndices = [1,3,3]
+Output: [3,3,4]
+Explanation: 
+- 1st query updates s = "bbbacc". The longest substring consisting of one repeating character is "bbb" with length 3.
+- 2nd query updates s = "bbbccc". 
+  The longest substring consisting of one repeating character can be "bbb" or "ccc" with length 3.
+- 3rd query updates s = "bbbbcc". The longest substring consisting of one repeating character is "bbbb" with length 4.
+Thus, we return [3,3,4].
+Example 2:
+
+Input: s = "abyzz", queryCharacters = "aa", queryIndices = [2,1]
+Output: [2,3]
+Explanation:
+- 1st query updates s = "abazz". The longest substring consisting of one repeating character is "zz" with length 2.
+- 2nd query updates s = "aaazz". The longest substring consisting of one repeating character is "aaa" with length 3.
+Thus, we return [2,3].
+
+Constraints:
+
+1 <= s.length <= 105
+s consists of lowercase English letters.
+k == queryCharacters.length == queryIndices.length
+1 <= k <= 105
+queryCharacters consists of lowercase English letters.
+0 <= queryIndices[i] < s.length
+
+#####
+#TLE#
+#####
+
+class Solution {
+public:
+    vector<int> longestRepeating(string s, string queryCharacters,
+                                 vector<int>& queryIndices) {
+        int len = s.length();
+        int k = queryIndices.size();
+        vector<int> lengths(k);
+        vector<string> strs(4 * len);
+        vector<int> maxLen(4 * len);
+        buildTree(0, 0, len - 1, strs, maxLen, s);
+        for (int i = 0; i < k; i++) {
+            updateTree(0, 0, len - 1, queryIndices[i], queryCharacters[i], strs,
+                       maxLen);
+            lengths[i] = maxLen[0];
+        }
+        return lengths;
+    }
+
+    void buildTree(int idx, int l, int r, vector<string>& strs,
+                   vector<int>& maxLen, string& s) {
+        if (l == r) {
+            strs[idx] = s.substr(l, 1);
+            maxLen[idx] = 1;
+            return;
+        }
+        int mid = l + (r - l) / 2;
+        int lci = 2 * idx + 1;
+        int rci = 2 * idx + 2;
+        strs[idx] = s.substr(l, r - l + 1);
+        buildTree(lci, l, mid, strs, maxLen, s);
+        buildTree(rci, mid + 1, r, strs, maxLen, s);
+        strs[idx] = strs[lci] + strs[rci];
+        maxLen[idx] = combine(strs[lci], strs[rci], maxLen[lci], maxLen[rci]);
+    }
+
+    void updateTree(int idx, int l, int r, int pos, char newCh,
+                    vector<string>& strs, vector<int>& maxLen) {
+        if (l == r) {
+            strs[idx][0] = newCh;
+            maxLen[idx] = 1;
+            return;
+        }
+        int mid = l + (r - l) / 2;
+        int lci = 2 * idx + 1;
+        int rci = 2 * idx + 2;
+        if (pos <= mid)
+            updateTree(lci, l, mid, pos, newCh, strs, maxLen);
+        else
+            updateTree(rci, mid + 1, r, pos, newCh, strs, maxLen);
+
+        strs[idx] = strs[lci] + strs[rci];
+        maxLen[idx] = combine(strs[lci], strs[rci], maxLen[lci], maxLen[rci]);
+    }
+
+    int combine(const string& left, const string& right, int leftMax,
+                int rightMax) {
+        int count = max(leftMax, rightMax);
+        if (left.back() == right.front()) {
+            int suf = 1;
+            for (int i = (int)left.length() - 2;
+                 i >= 0 && left[i] == left.back(); i--)
+                suf++;
+            int pre = 1;
+            for (int i = 1;
+                 i < (int)right.length() && right[i] == right.front(); i++)
+                pre++;
+            count = max(count, suf + pre);
+        }
+        return count;
+    }
+};
+
+
+#####
+#SOL#
+#####
+
+struct Node {
+    int len = 0, best = 0, pref = 0, suff = 0;
+    char leftChar = 0, rightChar = 0;
+};
+
+class Solution {
+public:
+    vector<Node> tree;
+    string s;
+
+    vector<int> longestRepeating(string str, string queryCharacters,
+                                 vector<int>& queryIndices) {
+        s = str;
+        int len = s.length();
+        int k = queryIndices.size();
+        vector<int> lengths(k);
+        tree.assign(4 * len, Node());
+        buildTree(0, 0, len - 1);
+        for (int i = 0; i < k; i++) {
+            s[queryIndices[i]] = queryCharacters[i];
+            updateTree(0, 0, len - 1, queryIndices[i], queryCharacters[i]);
+            lengths[i] = tree[0].best;
+        }
+        return lengths;
+    }
+
+    void buildTree(int idx, int l, int r) {
+        if (l == r) {
+            tree[idx] = {1, 1, 1, 1, s[l], s[l]};
+            return;
+        }
+        int mid = l + (r - l) / 2;
+        int lci = 2 * idx + 1;
+        int rci = 2 * idx + 2;
+        buildTree(lci, l, mid);
+        buildTree(rci, mid + 1, r);
+        tree[idx] = combine(tree[lci], tree[rci]);
+    }
+
+    void updateTree(int idx, int l, int r, int pos, char newCh) {
+        if (l == r) {
+            tree[idx] = {1, 1, 1, 1, s[l], s[l]};
+            return;
+        }
+        int mid = l + (r - l) / 2;
+        int lci = 2 * idx + 1;
+        int rci = 2 * idx + 2;
+        if (pos <= mid)
+            updateTree(lci, l, mid, pos, newCh);
+        else
+            updateTree(rci, mid + 1, r, pos, newCh);
+        tree[idx] = combine(tree[lci], tree[rci]);
+    }
+
+    Node combine(Node& leftChild, Node& rightChild) {
+        Node result;
+        result.len = leftChild.len + rightChild.len;
+        result.leftChar = leftChild.leftChar;
+        result.rightChar = rightChild.rightChar;
+
+        result.pref = leftChild.pref;
+        if (leftChild.pref == leftChild.len &&
+            leftChild.rightChar == rightChild.leftChar)
+            result.pref += rightChild.pref;
+
+        result.suff = rightChild.suff;
+        if (rightChild.suff == rightChild.len &&
+            leftChild.rightChar == rightChild.leftChar)
+            result.suff += leftChild.suff;
+
+        int count = max(leftChild.best, rightChild.best);
+        if (leftChild.rightChar == rightChild.leftChar)
+            count = max(count, leftChild.suff + rightChild.pref);
+        result.best = count;
+
+        return result;
+    }
+};
