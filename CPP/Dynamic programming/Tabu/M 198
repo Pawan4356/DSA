@@ -22,44 +22,21 @@ Constraints:
 1 <= nums.length <= 100
 0 <= nums[i] <= 400
 
+
 class Solution {
 public:
     int rob(vector<int>& nums) {
         int len = nums.size();
-        return solve(nums, 0, len);
-    }
-
-    int solve(vector<int> nums, int curr, int len) {
-        if (curr >= len) {
-            return 0;
+        if (len == 1) return nums[0];
+        vector<int> dp(len + 1);
+        dp[0] = 0;
+        dp[1] = nums[0];
+        int take, skip;
+        for (int i = 2; i <= len; i++) {
+            take = nums[i - 1] + dp[i - 2];
+            skip = dp[i - 1];
+            dp[i] = max(take, skip);
         }
-        int result = INT_MIN;
-        if (curr + 1 < len)
-            result = max(result, nums[curr + 1] + solve(nums, curr + 3, len));
-        result = max(result, nums[curr] + solve(nums, curr + 2, len));
-        result = max(result, nums[curr] + solve(nums, curr + 3, len));
-        return result;
-    }
-};
-
-
-class Solution {
-public:
-    int solve(vector<int>& nums, int i, vector<int>& dp) {
-        if (i >= nums.size())
-            return 0;
-
-        if (dp[i] != -1)
-            return dp[i];
-
-        int rob = nums[i] + solve(nums, i + 2, dp);
-        int skip = solve(nums, i + 1, dp);
-
-        return dp[i] = max(rob, skip);
-    }
-
-    int rob(vector<int>& nums) {
-        vector<int> dp(nums.size(), -1);
-        return solve(nums, 0, dp);
+        return dp[len];
     }
 };
